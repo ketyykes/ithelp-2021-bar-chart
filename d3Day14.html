@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <title>Document</title>
+    <style>
+      .btn {
+        padding: 8px;
+        background-color: orange;
+        border: none;
+        border-radius: 4px;
+      }
+      .btn:hover {
+        background-color: rgba(255, 166, 0, 0.664);
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+    //   let btn = d3
+    //     .select("body")
+    //     .append("button")
+    //     .text("按鈕")
+    //     .style("display", "block")
+    //     .classed("btn", true)
+    //     .on("click", render);
+    //   function render() {
+    //     d3.select("body").select("svg").remove();
+    //     let randomIntFun = d3.randomInt(50, 400);
+    //     let randomArr = [];
+
+    //     for (let index = 0; index < 20; index++) {
+    //       randomArr.push(randomIntFun());
+    //     }
+    //     let padding = 40;
+    //     let svg = d3
+    //       .select("body")
+    //       .append("svg")
+    //       .attr("width", 800)
+    //       .attr("height", 450);
+    //     svg
+    //       .selectAll("rect")
+    //       .data(randomArr)
+    //       .join("rect")
+    //       .attr("x", (d, i) => {
+    //         return padding + i * 30;
+    //       })
+    //       .attr("y", () => 400 + padding)
+    //       .attr("width", 20)
+    //       .attr("height", 0)
+    //       .attr("fill", "green")
+    //       .transition()
+    //       .duration("1000")
+    //       .attr("y", (d) => {
+    //         return 400 - d + padding;
+    //       })
+    //       .attr("height", (d) => {
+    //         return d;
+    //       });
+
+    //     let scaleY = d3.scaleLinear().domain([0, 400]).range([400, 0]);
+    //     let axisY = d3.axisRight(scaleY);
+
+    //     let g = svg.append("g");
+    //     axisY(g);
+    //     g.attr("transform", `translate(0,40)`);
+    //   }
+    //   render();
+
+
+      d3.json("populationDensity.json")
+      .then((data) => {
+        return data.result.records;
+      })
+      .then((data) => {
+        const reg = RegExp(/臺北市/);
+        return data.filter((el) => {
+          return reg.test(el.site_id);
+        });
+      })
+      .then((taipei) => {
+        const newTaipei = taipei.map((el) => {
+          el.people_total = Number(el.people_total);
+          el.area = Number(el.area);
+          el.population_density = Number(el.population_density);
+          el.site_id = el.site_id.substr(3);
+          return el;
+        });
+
+        let padding = 50;
+        const svg = d3
+          .select("body")
+          .append("svg")
+          .attr("width", 800)
+          .attr("height", 450);
+        let min = d3.min(newTaipei, (d) => d.people_total);
+        let max = d3.max(newTaipei, (d) => d.people_total);
+        console.log(newTaipei);
+        const scaleY = d3.scaleLinear().domain([0, 320000]).range([400, 0]);
+
+        svg.selectAll("rect")
+          .data(newTaipei)
+          .join("rect")
+          .attr("x", (d, i) => {
+            return padding + i * 60;
+          })
+          .attr("y", 400)
+          .attr("height", 0)
+          .attr("width", 50)
+          .attr("fill", "orange")
+          .transition()
+          .duration(3000)
+          .attr("y", (d) => {
+            return scaleY(d.people_total);
+          })
+          .attr("height", (d) => {
+            return 400 - scaleY(d.people_total);
+          });
+
+        svg.selectAll("text")
+          .data(newTaipei)
+          .join("text")
+          .text((d) => {
+            return d.site_id;
+          })
+          .attr("x", (d, i) => {
+            return padding + i * 60;
+          })
+          .attr("y", (y) => {
+            return 450 - 20;
+          });
+
+        const axisY = d3.axisRight(scaleY)
+                      .ticks(5)
+                      .tickFormat(function (d) {
+                      return d / 10000 + "萬";
+                      });
+        const g = svg.append("g");
+        axisY(g);
+
+
+          svg.selectAll("rect")
+            .on("mouseenter", function () {
+              let thisRectX = d3.select(this).attr("x");
+              let thisRectY = d3.select(this).attr("y");
+              
+              let text = d3.select(this).data()[0].people_total;
+              d3.select(this).transition().duration(800).attr("fill","blue");
+              svg.append("text")
+              .attr("id","people-total")
+              .attr("x",thisRectX)
+              .attr("y", ()=>(scaleY(text)-10))
+              .style("fill","blue")
+              .text(text);
+
+          }).on("mouseleave",function () {
+            d3.select(this)
+            .transition()
+            .duration(800)
+            .attr("fill","orange");
+              svg.select("#people-total").remove(this);
+          })
+      });
+    </script>
+  </body>
+</html>

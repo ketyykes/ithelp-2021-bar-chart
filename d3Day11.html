@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.0.0/d3.min.js"
+        integrity="sha512-0x7/VCkKLLt4wnkFqI8Cgv6no+AaS1TDgmHLOoU3hy/WVtYta2J6gnOIHhYYDJlDxPqEqAYLPS4gzVex4mGJLw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <title>Document</title>
+    <style></style>
+</head>
+
+<body>
+    <script>
+      
+        
+        d3.json("populationDensity.json")
+            .then((data) => {
+                console.log(data);
+                return data.result.records;
+            })
+            .then((data) => {
+                const reg = RegExp(/臺北市/);
+                return data.filter((el) => {
+                    return reg.test(el.site_id);
+                });
+            })
+            .then((taipei) => {
+                const newTaipei = taipei.map((el) => {
+                    el.people_total = Number(el.people_total);
+                    el.area = Number(el.area);
+                    el.population_density = Number(el.population_density);
+                    el.site_id = el.site_id.substr(3);
+                    return el;
+                });
+            
+                let padding = 50;
+                const svg = d3.select("body")
+                            .append("svg")
+                            .attr("width", 800)
+                            .attr("height", 450);
+                let min = d3.min(newTaipei, (d) => d.people_total);
+                let max = d3.max(newTaipei, (d) => d.people_total);
+                console.log(newTaipei);
+                let scaleY = d3
+                .scaleLinear()
+                .domain([0, 320000])
+                .range([400, 0]);
+
+                svg.selectAll("rect")
+                .data(newTaipei)
+                .join("rect")
+                .attr("x", (d, i) => {
+                    return padding + i * 60;
+                })
+                .attr("y", (d) => {
+                    console.log(scaleY(d.people_total));
+                    return scaleY(d.people_total);
+                })
+                .attr("width", 50)
+                .attr("height", (d) => {
+                    return 400 - scaleY(d.people_total);
+                })
+                .attr("fill", "orange");
+                
+                
+                svg.selectAll("text")
+                .data(newTaipei)
+                .join("text")
+                .text((d) => {
+                    return d.site_id;
+                })
+                .attr("x", (d, i) => {
+                    return padding + i * 60;
+                })
+                .attr("y", (y) => {
+                    return 450 -20;
+                });
+            })
+
+
+    </script>
+</body>
+
+</html>
