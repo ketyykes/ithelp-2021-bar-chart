@@ -51,24 +51,26 @@
         console.log(newTaipei);
         const scaleY = d3.scaleLinear().domain([0, 320000]).range([400, 0]);
 
+
         svg.selectAll("rect")
-          .data(newTaipei)
-          .join("rect")
-          .attr("x", (d, i) => {
-            return padding + i * 60;
-          })
-          .attr("y", 400)
-          .attr("height", 0)
-          .attr("width", 50)
-          .attr("fill", "orange")
-          .transition()
-          .duration(3000)
-          .attr("y", (d) => {
-            return scaleY(d.people_total);
-          })
-          .attr("height", (d) => {
-            return 400 - scaleY(d.people_total);
-          });
+        .data(newTaipei)
+        .join("rect")
+        .attr("x", (d, i) => {
+          return padding + i * 60;
+        })
+        .attr("y", 400)
+        .attr("height", 0)
+        .attr("width", 50)
+        .attr("fill", "orange")
+        .transition()
+        .duration(3000)
+        .attr("y", (d) => {
+          return scaleY(d.people_total);
+        })
+        .attr("height", (d) => {
+          return 400 - scaleY(d.people_total);
+        })
+        ;
 
         svg.selectAll("text")
           .data(newTaipei)
@@ -82,7 +84,12 @@
           .attr("y", (y) => {
             return 450 - 20;
           });
+   
 
+
+
+
+        
         const axisY = d3.axisRight(scaleY)
                       .ticks(5)
                       .tickFormat(function (d) {
@@ -90,30 +97,32 @@
                       });
         const g = svg.append("g");
         axisY(g);
-
-
+        setTimeout(() =>{addBlueEffect()},3000); //避免Bar的高度還沒生長完就觸發變色效果
+        function addBlueEffect() {
           svg.selectAll("rect")
-            .on("mouseenter", function () {
-              const thisRectX = d3.select(this).attr("x");
-              const thisRectY = d3.select(this).attr("y");
-              
-              const text = d3.select(this).data()[0].people_total;
-              d3.select(this).transition().duration(800).attr("fill","blue");
-              svg.append("text")
-              .attr("id","people-total")
-              .attr("x",thisRectX)
-              .attr("y", ()=>(scaleY(text)-10))
-              .style("fill","blue")
-              .text(text);
+          .on("mouseenter", function () {
+          const thisRectX = d3.select(this).attr("x");
+          const thisRectY = d3.select(this).attr("y");
+          const text = d3.select(this).data()[0].people_total;
+          d3.select(this)   
+          .transition().duration(800).attr("fill","blue")
+          ;
+          svg.append("text")
+          .attr("id","people-total")
+          .attr("x",thisRectX)
+          .attr("y", ()=>(scaleY(text)-10))
+          .style("fill","blue")
+          .text(text);
 
           }).on("mouseleave",function () {
-            d3.select(this)
-            .transition()
-            .duration(800)
-            .attr("fill","orange");
-              svg.select("#people-total").remove(this);
+          d3.select(this)
+          .transition()
+          .duration(800)
+          .attr("fill","orange");
+            svg.select("#people-total").remove(this);
           })
-      });
+        }
+      })
     </script>
   </body>
 </html>
