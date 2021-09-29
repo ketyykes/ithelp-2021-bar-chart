@@ -21,57 +21,6 @@
   </head>
   <body>
     <script>
-    //   let btn = d3
-    //     .select("body")
-    //     .append("button")
-    //     .text("按鈕")
-    //     .style("display", "block")
-    //     .classed("btn", true)
-    //     .on("click", render);
-    //   function render() {
-    //     d3.select("body").select("svg").remove();
-    //     let randomIntFun = d3.randomInt(50, 400);
-    //     let randomArr = [];
-
-    //     for (let index = 0; index < 20; index++) {
-    //       randomArr.push(randomIntFun());
-    //     }
-    //     let padding = 40;
-    //     let svg = d3
-    //       .select("body")
-    //       .append("svg")
-    //       .attr("width", 800)
-    //       .attr("height", 450);
-    //     svg
-    //       .selectAll("rect")
-    //       .data(randomArr)
-    //       .join("rect")
-    //       .attr("x", (d, i) => {
-    //         return padding + i * 30;
-    //       })
-    //       .attr("y", () => 400 + padding)
-    //       .attr("width", 20)
-    //       .attr("height", 0)
-    //       .attr("fill", "green")
-    //       .transition()
-    //       .duration("1000")
-    //       .attr("y", (d) => {
-    //         return 400 - d + padding;
-    //       })
-    //       .attr("height", (d) => {
-    //         return d;
-    //       });
-
-    //     let scaleY = d3.scaleLinear().domain([0, 400]).range([400, 0]);
-    //     let axisY = d3.axisRight(scaleY);
-
-    //     let g = svg.append("g");
-    //     axisY(g);
-    //     g.attr("transform", `translate(0,40)`);
-    //   }
-    //   render();
-
-
       d3.json("populationDensity.json")
       .then((data) => {
         return data.result.records;
@@ -145,10 +94,10 @@
 
           svg.selectAll("rect")
             .on("mouseenter", function () {
-              let thisRectX = d3.select(this).attr("x");
-              let thisRectY = d3.select(this).attr("y");
+              const thisRectX = d3.select(this).attr("x");
+              const thisRectY = d3.select(this).attr("y");
               
-              let text = d3.select(this).data()[0].people_total;
+              const text = d3.select(this).data()[0].people_total;
               d3.select(this).transition().duration(800).attr("fill","blue");
               svg.append("text")
               .attr("id","people-total")
