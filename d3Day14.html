@@ -71,7 +71,6 @@
           return 400 - scaleY(d.people_total);
         })
         ;
-
         svg.selectAll("text")
           .data(newTaipei)
           .join("text")
@@ -85,11 +84,6 @@
             return 450 - 20;
           });
    
-
-
-
-
-        
         const axisY = d3.axisRight(scaleY)
                       .ticks(5)
                       .tickFormat(function (d) {
